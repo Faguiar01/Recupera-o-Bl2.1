@@ -1,0 +1,1317 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Preparação e Prova: Auditoria e Gestão Documental</title>
+<style>
+    :root {
+        --primary: #003366;
+        --secondary: #00509e;
+        --accent: #ffcc00;
+        --bg: #f4f6f8;
+        --text: #333;
+        --success: #28a745;
+        --danger: #dc3545;
+        --warning: #ff9800;
+        --radius: 10px;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background-color: var(--bg);
+        color: var(--text);
+        margin: 0;
+        padding: 20px;
+        -webkit-font-smoothing: antialiased;
+    }
+
+    .container {
+        max-width: 880px;
+        margin: 0 auto;
+        background: #fff;
+        padding: 30px;
+        border-radius: var(--radius);
+        box-shadow: 0 4px 15px rgba(0,0,0,.1);
+    }
+
+    h1, h2, h3 { color: var(--primary); margin-top: 0; }
+
+    /* --- Controle de telas --- */
+    #study-screen,
+    #student-registration,
+    #exam-screen,
+    #result-screen { display: none; }
+
+    #study-screen.active,
+    #student-registration.active,
+    #exam-screen.active,
+    #result-screen.active { display: block; }
+
+    /* =========================================================
+       ESTUDO
+       ========================================================= */
+    .study-section {
+        background: #fdfdfd;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        padding: 20px 22px 18px;
+        margin-bottom: 20px;
+    }
+    .study-section h2 {
+        font-size: 1.15rem;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        border-bottom: 2px solid var(--accent);
+        padding-bottom: 8px;
+        margin: 0 0 12px;
+    }
+    .section-num {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        background: var(--primary);
+        color: #fff;
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        font-weight: 700;
+        font-size: .88rem;
+        flex-shrink: 0;
+    }
+    .study-content {
+        font-size: .94rem;
+        line-height: 1.6;
+        color: #2c3e50;
+    }
+    .study-content ul { padding-left: 22px; margin: 8px 0; }
+    .study-content li { margin-bottom: 6px; }
+    .study-content strong { color: var(--primary); }
+
+    .study-exercise {
+        background: #f0f7ff;
+        border-left: 4px solid var(--secondary);
+        border-radius: 0 6px 6px 0;
+        padding: 14px 16px;
+        margin-top: 14px;
+    }
+    .exercise-prompt {
+        margin: 0 0 10px;
+        font-size: .93rem;
+        line-height: 1.5;
+    }
+    .exercise-options {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+    .ex-btn {
+        text-align: left;
+        background: #fff;
+        border: 1px solid #c9d6e2;
+        padding: 10px 14px;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: .89rem;
+        font-family: inherit;
+        line-height: 1.4;
+        color: var(--text);
+        transition: background .2s, border-color .2s, transform .1s;
+    }
+    .ex-btn:hover:not(:disabled) {
+        background: #e6f2ff;
+        border-color: var(--secondary);
+    }
+    .ex-btn:active:not(:disabled) { transform: scale(.995); }
+    .ex-btn:disabled { cursor: default; }
+
+    .ex-btn.ex-correct {
+        background: #d4edda;
+        border-color: #28a745;
+        color: #155724;
+        font-weight: 600;
+    }
+    .ex-btn.ex-wrong {
+        background: #f8d7da;
+        border-color: #dc3545;
+        color: #721c24;
+    }
+
+    .exercise-feedback {
+        margin-top: 10px;
+        font-size: .9rem;
+        min-height: 1.2em;
+        font-weight: 600;
+    }
+    .fb-ok  { color: #155724; }
+    .fb-bad { color: #721c24; }
+
+    .study-progress-bar {
+        background: #eef1f4;
+        padding: 10px 14px;
+        border-radius: 6px;
+        font-size: .85rem;
+        font-weight: 600;
+        color: var(--primary);
+        margin-bottom: 20px;
+    }
+
+    /* =========================================================
+       CADASTRO / PROVA / RESULTADO
+       ========================================================= */
+    .header-bar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 14px;
+        flex-wrap: wrap;
+        border-bottom: 3px solid var(--accent);
+        padding-bottom: 12px;
+        margin-bottom: 18px;
+    }
+    .header-bar h2 { margin: 0; font-size: 1.35rem; }
+
+    .header-info {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+    .date-chip {
+        background: #eef1f4;
+        color: var(--primary);
+        padding: 8px 14px;
+        border-radius: 6px;
+        font-size: .82rem;
+        font-weight: 700;
+        border: 1px solid #d6dde4;
+    }
+    .timer-box {
+        background: var(--secondary);
+        color: #fff;
+        padding: 8px 16px;
+        border-radius: 6px;
+        font-weight: 700;
+        font-variant-numeric: tabular-nums;
+        min-width: 130px;
+        text-align: center;
+        line-height: 1.15;
+    }
+    .timer-box .timer-label {
+        display: block;
+        font-size: .62rem;
+        text-transform: uppercase;
+        letter-spacing: .8px;
+        opacity: .9;
+        font-weight: 600;
+    }
+    .timer-box .timer-value {
+        display: block;
+        font-size: 1.3rem;
+        letter-spacing: 1px;
+    }
+
+    .status-bar {
+        background: #e9ecef;
+        padding: 12px 16px;
+        border-radius: 6px;
+        margin-bottom: 20px;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px 24px;
+        justify-content: space-between;
+        font-weight: 600;
+        font-size: .92rem;
+    }
+    .status-bar .penalties { color: var(--danger); }
+
+    .progress-wrapper { margin-bottom: 18px; }
+    .progress-header {
+        display: flex;
+        justify-content: space-between;
+        font-size: .88rem;
+        font-weight: 700;
+        color: var(--primary);
+        margin-bottom: 6px;
+    }
+    .progress-bar {
+        height: 9px;
+        background: #e9ecef;
+        border-radius: 5px;
+        overflow: hidden;
+    }
+    .progress-fill {
+        height: 100%;
+        background: linear-gradient(90deg, var(--secondary), var(--primary));
+        border-radius: 5px;
+        transition: width .35s ease;
+    }
+
+    .question-card {
+        background: #fdfdfd;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        padding: 20px 22px;
+        margin: 0 0 18px;
+    }
+    .capacity-box {
+        background: linear-gradient(135deg, #fff8e1, #fff3cd);
+        border-left: 4px solid var(--accent);
+        padding: 12px 14px;
+        border-radius: 0 6px 6px 0;
+        margin-bottom: 18px;
+    }
+    .capacity-label {
+        display: inline-block;
+        background: var(--accent);
+        color: var(--primary);
+        font-size: .68rem;
+        font-weight: 800;
+        letter-spacing: 1px;
+        padding: 3px 9px;
+        border-radius: 4px;
+        margin-bottom: 6px;
+        text-transform: uppercase;
+    }
+    .capacity-text {
+        font-size: .95rem;
+        color: #4a4a4a;
+        line-height: 1.45;
+        display: block;
+    }
+
+    .section { margin-bottom: 16px; }
+    .section-label {
+        display: inline-block;
+        font-size: .72rem;
+        font-weight: 800;
+        letter-spacing: 1.2px;
+        color: var(--secondary);
+        text-transform: uppercase;
+        margin: 0 0 6px;
+        padding-bottom: 2px;
+        border-bottom: 2px solid var(--secondary);
+    }
+    .context-text {
+        background: #e6f2ff;
+        padding: 11px 13px;
+        border-left: 4px solid var(--secondary);
+        border-radius: 0 4px 4px 0;
+        margin: 0;
+        font-size: .93rem;
+        line-height: 1.5;
+        color: #2c3e50;
+    }
+    .command-text {
+        font-size: .96rem;
+        line-height: 1.5;
+        margin: 0;
+        font-weight: 600;
+        color: #1a1a1a;
+    }
+
+    .options-list { list-style: none; padding: 0; margin: 0; }
+    .options-list li { margin-bottom: 9px; }
+    .option-label {
+        display: flex;
+        align-items: flex-start;
+        gap: 12px;
+        background: #f8f9fa;
+        padding: 12px 14px;
+        border-radius: 6px;
+        cursor: pointer;
+        border: 1px solid #dee2e6;
+        transition: background .2s, border-color .2s;
+        line-height: 1.45;
+        font-size: .94rem;
+    }
+    .option-label:hover { background: #e2e6ea; border-color: #c9cfd5; }
+    .option-label input[type="radio"] {
+        margin: 3px 0 0;
+        transform: scale(1.2);
+        flex: 0 0 auto;
+        accent-color: var(--secondary);
+    }
+    .option-letter {
+        font-weight: 800;
+        color: var(--primary);
+        flex: 0 0 auto;
+        min-width: 22px;
+    }
+    .option-label:has(input:checked) {
+        background: #dce9f7;
+        border-color: var(--secondary);
+    }
+
+    .btn {
+        display: block;
+        background: var(--primary);
+        color: #fff;
+        border: none;
+        padding: 14px 25px;
+        border-radius: 6px;
+        font-size: 1.05em;
+        font-weight: 600;
+        cursor: pointer;
+        width: 100%;
+        transition: background .25s, transform .1s;
+        margin-top: 12px;
+    }
+    .btn:hover { background: var(--secondary); }
+    .btn:active { transform: scale(.99); }
+    .btn:disabled { opacity: .6; cursor: not-allowed; }
+    .btn-secondary { background: #6c757d; }
+    .btn-secondary:hover { background: #5a6268; }
+
+    label.field-label { display: block; font-weight: 600; margin-bottom: 6px; }
+    input[type="text"] {
+        width: 100%;
+        padding: 11px;
+        margin-bottom: 20px;
+        border: 1px solid #ccc;
+        border-radius: 6px;
+        font-size: 1rem;
+        font-family: inherit;
+    }
+    input[type="text"]:focus { outline: 2px solid var(--secondary); border-color: transparent; }
+
+    .info-box {
+        background: #e6f2ff;
+        padding: 12px 14px;
+        border-left: 4px solid var(--secondary);
+        border-radius: 0 4px 4px 0;
+        font-size: .9rem;
+        line-height: 1.55;
+        margin-bottom: 20px;
+        color: #2c3e50;
+    }
+
+    .score-breakdown {
+        list-style: none;
+        padding: 0;
+        margin: 0 0 20px;
+        border: 1px solid #e0e0e0;
+        border-radius: 8px;
+        overflow: hidden;
+    }
+    .score-breakdown li {
+        display: flex;
+        justify-content: space-between;
+        padding: 11px 16px;
+        border-bottom: 1px solid #eee;
+    }
+    .score-breakdown li:last-child { border-bottom: none; background: #f8f9fa; font-weight: 700; }
+
+    .toast {
+        position: fixed;
+        left: 50%;
+        bottom: 24px;
+        transform: translateX(-50%) translateY(150%);
+        background: var(--danger);
+        color: #fff;
+        padding: 14px 24px;
+        border-radius: 8px;
+        box-shadow: 0 6px 24px rgba(0,0,0,.28);
+        font-weight: 600;
+        max-width: 90vw;
+        text-align: center;
+        transition: transform .3s ease;
+        z-index: 999;
+    }
+    .toast.show { transform: translateX(-50%) translateY(0); }
+    .toast.warning { background: var(--warning); }
+    .toast.info { background: var(--secondary); }
+
+    /* =========================================================
+       CONTÊINER DO PDF — CORRIGIDO
+       Deve estar renderizado (na viewport) para o html2canvas
+       capturar. Fica invisível via opacity: 0.
+       ========================================================= */
+    #pdf-template-container {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        z-index: -1;
+        opacity: 0;
+        pointer-events: none;
+        width: 794px;
+        background: #fff;
+        color: #000;
+        font-family: 'Segoe UI', Arial, sans-serif;
+        font-size: 12px;
+    }
+    .pdf-header {
+        text-align: center;
+        border-bottom: 2px solid #000;
+        margin-bottom: 16px;
+        padding-bottom: 10px;
+    }
+    .pdf-header h2 { margin: 0 0 6px; font-size: 16px; color: #000; }
+    .pdf-header p  { margin: 3px 0; }
+
+    .pdf-summary {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 16px;
+        font-size: 11.5px;
+    }
+    .pdf-summary td { border: 1px solid #bbb; padding: 5px 9px; }
+    .pdf-summary td:first-child { background: #f0f0f0; font-weight: 700; width: 42%; }
+
+    .pdf-section-title {
+        font-weight: 700;
+        font-size: 13px;
+        margin: 14px 0 8px;
+        border-bottom: 1.5px solid #333;
+        padding-bottom: 3px;
+    }
+
+    .pdf-question {
+        margin-bottom: 14px;
+        padding-bottom: 10px;
+        border-bottom: 1px dashed #ccc;
+        page-break-inside: avoid;
+        break-inside: avoid;
+    }
+    .pdf-q-title {
+        font-weight: 700;
+        font-size: 12.5px;
+        margin: 0 0 6px;
+        color: #003366;
+    }
+    .pdf-q-capacity {
+        background: #fff8e1;
+        border-left: 3px solid #ffcc00;
+        padding: 5px 8px;
+        font-size: 11px;
+        margin-bottom: 6px;
+        font-style: italic;
+    }
+    .pdf-q-context {
+        background: #eef6ff;
+        border-left: 3px solid #00509e;
+        padding: 5px 8px;
+        font-size: 11px;
+        margin-bottom: 6px;
+    }
+    .pdf-q-command {
+        font-weight: 600;
+        font-size: 11.5px;
+        margin-bottom: 6px;
+    }
+    .pdf-q-command strong { color: #003366; }
+
+    .pdf-option {
+        border-left: 3px solid #ccc;
+        padding: 4px 8px;
+        margin-bottom: 4px;
+        font-size: 11px;
+        line-height: 1.4;
+    }
+    .pdf-option.correct-option { background: #eaf7ee; border-left-color: #28a745; }
+    .pdf-option.wrong-option   { background: #fdecee; border-left-color: #dc3545; }
+    .pdf-option-letter { font-weight: 700; margin-right: 4px; }
+    .pdf-just {
+        font-size: 10.5px;
+        color: #555;
+        font-style: italic;
+        margin-top: 3px;
+        padding-left: 10px;
+        border-left: 1px dotted #999;
+    }
+    .ok  { color: #1a7f37; font-weight: 700; }
+    .bad { color: #c1121f; font-weight: 700; }
+
+    @media (max-width: 560px) {
+        body { padding: 12px; }
+        .container { padding: 18px; }
+        .status-bar { font-size: .82rem; }
+        .timer-box .timer-value { font-size: 1.1rem; }
+        .timer-box { min-width: 110px; }
+        .header-bar h2 { font-size: 1.1rem; }
+        .study-section { padding: 16px; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        *, *::before, *::after { animation: none !important; transition: none !important; }
+    }
+</style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+</head>
+<body>
+
+<!-- ============================================================
+     TELA 0: PREPARAÇÃO / ESTUDO
+     ============================================================ -->
+<div id="study-screen" class="container active">
+    <h1>Preparação para a Avaliação</h1>
+    <div class="info-box">
+        <strong>📅 Data:</strong> <span id="study-date"></span><br>
+        Estude os tópicos abaixo antes de iniciar a prova. Cada seção traz um pequeno exercício
+        com feedback imediato. Ao terminar, clique em <strong>"Estou pronto!"</strong> no final da página.
+    </div>
+
+    <div class="study-progress-bar">
+        ✅ Exercícios concluídos: <span id="study-progress">0</span> de 6
+    </div>
+
+    <!-- SEÇÃO 1 -->
+    <div class="study-section">
+        <h2><span class="section-num">1</span> Ciclo de Vida Documental</h2>
+        <div class="study-content">
+            <p>A <strong>Teoria das Três Idades</strong> classifica os documentos em três fases, conforme a frequência de uso:</p>
+            <ul>
+                <li><strong>1ª Idade – Arquivo Corrente:</strong> documentos de uso frequente, mantidos próximos ao setor que os produziu. Alta importância administrativa.</li>
+                <li><strong>2ª Idade – Arquivo Intermediário:</strong> documentos de uso eventual, aguardando avaliação. Menor frequência de consulta.</li>
+                <li><strong>3ª Idade – Destinação Final:</strong> o documento é eliminado (descarte) ou preservado permanentemente por valor histórico.</li>
+            </ul>
+        </div>
+        <div class="study-exercise">
+            <p class="exercise-prompt"><strong>Exercício 1:</strong> Após 5 anos, os processos encerrados de uma empresa são consultados apenas eventualmente e aguardam avaliação da comissão. Em qual fase do ciclo de vida eles estão?</p>
+            <div class="exercise-options">
+                <button class="ex-btn" data-ex="ex1" data-correct="false" onclick="checkStudyExercise(this)">a) Arquivo corrente</button>
+                <button class="ex-btn" data-ex="ex1" data-correct="true"  onclick="checkStudyExercise(this)">b) Arquivo intermediário</button>
+                <button class="ex-btn" data-ex="ex1" data-correct="false" onclick="checkStudyExercise(this)">c) Destinação final</button>
+                <button class="ex-btn" data-ex="ex1" data-correct="false" onclick="checkStudyExercise(this)">d) Guarda permanente</button>
+            </div>
+            <div class="exercise-feedback" id="fb-ex1"></div>
+        </div>
+    </div>
+
+    <!-- SEÇÃO 2 -->
+    <div class="study-section">
+        <h2><span class="section-num">2</span> Tipologia Documental</h2>
+        <div class="study-content">
+            <p>Cada tipo de documento tem uma função específica dentro da organização:</p>
+            <ul>
+                <li><strong>Manuais e Normas Técnicas:</strong> padronizar e instruir procedimentos. Linguagem técnica e rigorosa, com estrutura normativa obrigatória.</li>
+                <li><strong>Revistas e Periódicos:</strong> informar inovações e tendências. Linguagem acessível e comunicativa.</li>
+                <li><strong>Relatórios:</strong> consolidar dados, resultados e análises.</li>
+                <li><strong>Atas:</strong> registrar decisões de reuniões.</li>
+            </ul>
+        </div>
+        <div class="study-exercise">
+            <p class="exercise-prompt"><strong>Exercício 2:</strong> Qual documento tem a função de padronizar procedimentos internos, com linguagem técnica e estrutura normativa obrigatória?</p>
+            <div class="exercise-options">
+                <button class="ex-btn" data-ex="ex2" data-correct="false" onclick="checkStudyExercise(this)">a) Revista</button>
+                <button class="ex-btn" data-ex="ex2" data-correct="false" onclick="checkStudyExercise(this)">b) Relatório</button>
+                <button class="ex-btn" data-ex="ex2" data-correct="true"  onclick="checkStudyExercise(this)">c) Manual ou Norma Técnica</button>
+                <button class="ex-btn" data-ex="ex2" data-correct="false" onclick="checkStudyExercise(this)">d) Ata</button>
+            </div>
+            <div class="exercise-feedback" id="fb-ex2"></div>
+        </div>
+    </div>
+
+    <!-- SEÇÃO 3 -->
+    <div class="study-section">
+        <h2><span class="section-num">3</span> Métodos de Ordenação</h2>
+        <div class="study-content">
+            <p>Os métodos de ordenação permitem localizar documentos com rapidez:</p>
+            <ul>
+                <li><strong>Alfabético:</strong> ordem por nome (autor, cliente).</li>
+                <li><strong>Numérico / Cronológico:</strong> por número sequencial (registro) ou por data (mês/ano).</li>
+                <li><strong>Ideográfico (por assunto):</strong> agrupa documentos por tema.</li>
+                <li><strong>Alfanumérico:</strong> combina letras e números.</li>
+            </ul>
+        </div>
+        <div class="study-exercise">
+            <p class="exercise-prompt"><strong>Exercício 3:</strong> Organizar os medicamentos de uma farmácia por categoria terapêutica (analgésicos, antibióticos, anti-inflamatórios) corresponde a qual método?</p>
+            <div class="exercise-options">
+                <button class="ex-btn" data-ex="ex3" data-correct="false" onclick="checkStudyExercise(this)">a) Alfabético</button>
+                <button class="ex-btn" data-ex="ex3" data-correct="false" onclick="checkStudyExercise(this)">b) Cronológico</button>
+                <button class="ex-btn" data-ex="ex3" data-correct="true"  onclick="checkStudyExercise(this)">c) Ideográfico (por assunto)</button>
+                <button class="ex-btn" data-ex="ex3" data-correct="false" onclick="checkStudyExercise(this)">d) Alfanumérico</button>
+            </div>
+            <div class="exercise-feedback" id="fb-ex3"></div>
+        </div>
+    </div>
+
+    <!-- SEÇÃO 4 -->
+    <div class="study-section">
+        <h2><span class="section-num">4</span> Agentes de Risco e Conservação</h2>
+        <div class="study-content">
+            <p>Alguns agentes danificam documentos físicos. As principais medidas preventivas e corretivas são:</p>
+            <ul>
+                <li><strong>Umidade e fungos:</strong> manter ventilação, controlar a temperatura e usar desumidificadores.</li>
+                <li><strong>Luz:</strong> afastar de janelas, usar iluminação indireta e proteger contra raios UV.</li>
+                <li><strong>Clipes de metal:</strong> remover antes de arquivar (evita oxidação).</li>
+                <li><strong>Insetos:</strong> higienização e controle ambiental.</li>
+            </ul>
+        </div>
+        <div class="study-exercise">
+            <p class="exercise-prompt"><strong>Exercício 4:</strong> Papéis que ficam próximos a janelas tornam-se amarelados e quebradiços com o tempo. Qual medida previne esse dano?</p>
+            <div class="exercise-options">
+                <button class="ex-btn" data-ex="ex4" data-correct="false" onclick="checkStudyExercise(this)">a) Retirar clipes de metal</button>
+                <button class="ex-btn" data-ex="ex4" data-correct="false" onclick="checkStudyExercise(this)">b) Usar desumidificadores</button>
+                <button class="ex-btn" data-ex="ex4" data-correct="true"  onclick="checkStudyExercise(this)">c) Manter longe de janelas e usar iluminação indireta</button>
+                <button class="ex-btn" data-ex="ex4" data-correct="false" onclick="checkStudyExercise(this)">d) Triturar os documentos</button>
+            </div>
+            <div class="exercise-feedback" id="fb-ex4"></div>
+        </div>
+    </div>
+
+    <!-- SEÇÃO 5 -->
+    <div class="study-section">
+        <h2><span class="section-num">5</span> POP – Procedimento Operacional Padrão</h2>
+        <div class="study-content">
+            <p>O <strong>POP</strong> é um documento que descreve, passo a passo, como executar uma tarefa. Suas principais funções:</p>
+            <ul>
+                <li>Padronizar procedimentos e garantir uniformidade na execução.</li>
+                <li>Permitir que qualquer colaborador execute a tarefa corretamente.</li>
+                <li>Dispensar o repasse informal ("tradição oral").</li>
+                <li>Reduzir erros e assegurar qualidade.</li>
+            </ul>
+        </div>
+        <div class="study-exercise">
+            <p class="exercise-prompt"><strong>Exercício 5:</strong> Qual é a principal vantagem do POP na gestão documental de uma empresa?</p>
+            <div class="exercise-options">
+                <button class="ex-btn" data-ex="ex5" data-correct="false" onclick="checkStudyExercise(this)">a) Substituir contratos físicos por arquivos digitais</button>
+                <button class="ex-btn" data-ex="ex5" data-correct="false" onclick="checkStudyExercise(this)">b) Reduzir o ciclo de vida documental</button>
+                <button class="ex-btn" data-ex="ex5" data-correct="true"  onclick="checkStudyExercise(this)">c) Padronizar tarefas e evitar dependência de repasse informal</button>
+                <button class="ex-btn" data-ex="ex5" data-correct="false" onclick="checkStudyExercise(this)">d) Servir como planta histórica em caso de sinistro</button>
+            </div>
+            <div class="exercise-feedback" id="fb-ex5"></div>
+        </div>
+    </div>
+
+    <!-- SEÇÃO 6 -->
+    <div class="study-section">
+        <h2><span class="section-num">6</span> Redação Técnica Executiva</h2>
+        <div class="study-content">
+            <p>Relatórios técnicos executivos exigem uma redação cuidadosa:</p>
+            <ul>
+                <li><strong>Impessoalidade:</strong> evitar opiniões pessoais ("eu acho").</li>
+                <li><strong>Norma culta:</strong> respeitar a gramática.</li>
+                <li><strong>Coesão e clareza:</strong> frases organizadas, sem ambiguidade.</li>
+                <li><strong>Sem gírias ou abreviações informais.</strong></li>
+                <li><strong>Glossário técnico:</strong> explicar termos técnicos, nivelando o conhecimento entre leitores de diferentes setores.</li>
+            </ul>
+        </div>
+        <div class="study-exercise">
+            <p class="exercise-prompt"><strong>Exercício 6:</strong> Qual característica é essencial na redação de um relatório técnico executivo?</p>
+            <div class="exercise-options">
+                <button class="ex-btn" data-ex="ex6" data-correct="false" onclick="checkStudyExercise(this)">a) Linguagem informal e opinativa</button>
+                <button class="ex-btn" data-ex="ex6" data-correct="true"  onclick="checkStudyExercise(this)">b) Impessoalidade, coesão e norma culta</button>
+                <button class="ex-btn" data-ex="ex6" data-correct="false" onclick="checkStudyExercise(this)">c) Abreviações de internet para agilizar a leitura</button>
+                <button class="ex-btn" data-ex="ex6" data-correct="false" onclick="checkStudyExercise(this)">d) Uso de gírias para aproximar o leitor</button>
+            </div>
+            <div class="exercise-feedback" id="fb-ex6"></div>
+        </div>
+    </div>
+
+    <button class="btn" style="margin-top:30px;" onclick="goToRegistration()">
+        Estou pronto! Iniciar Prova →
+    </button>
+</div>
+
+<!-- ============================================================
+     TELA 1: CADASTRO
+     ============================================================ -->
+<div id="student-registration" class="container">
+    <h1>Auditoria de Campo e Gestão de Arquivos</h1>
+    <p style="margin-bottom:16px;">Preencha seus dados para iniciar a avaliação.</p>
+
+    <div class="info-box">
+        <strong>📅 Data da avaliação:</strong> <span id="reg-date"></span><br>
+        <strong>⏱️ Controle de tempo:</strong> esta prova <strong>não possui limite de tempo</strong>.
+        Um cronômetro de tempo corrido registrará o tempo total decorrido.<br>
+        <strong>⚠️ Atenção:</strong> ao iniciar, caso você saia da aba ou minimize o navegador,
+        será registrada uma infração (<strong>-1 ponto</strong> por saída).<br>
+        <strong>➡️ Navegação:</strong> apenas o botão <strong>Avançar</strong> é exibido; não é possível voltar.
+    </div>
+
+    <label class="field-label" for="studentName">Nome Completo:</label>
+    <input type="text" id="studentName" maxlength="80" placeholder="Digite seu nome completo" autocomplete="off">
+
+    <label class="field-label" for="studentID">Matrícula / Turma:</label>
+    <input type="text" id="studentID" maxlength="30" placeholder="Digite sua matrícula" autocomplete="off">
+
+    <button class="btn" id="start-btn" onclick="startExam()">Iniciar Prova</button>
+</div>
+
+<!-- ============================================================
+     TELA 2: PROVA
+     ============================================================ -->
+<div id="exam-screen" class="container">
+    <div class="header-bar">
+        <h2>Avaliação Técnica</h2>
+        <div class="header-info">
+            <span class="date-chip" id="exam-date">—</span>
+            <div class="timer-box">
+                <span class="timer-label">Tempo decorrido</span>
+                <span class="timer-value" id="running-timer">00:00</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="status-bar">
+        <span>Aluno: <strong id="display-name"></strong></span>
+        <span class="penalties">Infrações: <span id="penalty-count">0</span></span>
+    </div>
+
+    <div id="questions-container"></div>
+</div>
+
+<!-- ============================================================
+     TELA 3: RESULTADOS
+     ============================================================ -->
+<div id="result-screen" class="container">
+    <h1>Prova Concluída!</h1>
+    <h2 id="final-score"></h2>
+    <ul class="score-breakdown" id="score-breakdown"></ul>
+    <p>O comprovante em PDF foi gerado e baixado automaticamente.</p>
+    <button class="btn" onclick="downloadPDF()">Baixar PDF novamente</button>
+    <button class="btn btn-secondary" onclick="location.reload()">Fazer nova prova</button>
+</div>
+
+<!-- CONTÊINER OCULTO PARA O PDF -->
+<div id="pdf-template-container"></div>
+
+<!-- TOAST -->
+<div class="toast" id="toast" role="alert" aria-live="assertive"></div>
+
+<script>
+/* ==========================================================
+   BANCO DE QUESTÕES DA PROVA
+   ========================================================== */
+const questoes = [
+    {
+        capacidade: "Identificar as características da primeira idade do ciclo de vida documental (arquivo corrente).",
+        contexto: "Em uma empresa, os documentos passam por três fases conforme a frequência de uso. O setor de compras mantém contratos e notas fiscais recentes à mão para consulta diária, enquanto documentos mais antigos são movidos para outro local.",
+        comando: "Caracterize o arquivo corrente, considerando a frequência de uso e a localização dos documentos nessa fase.",
+        alternativas: [
+            { texto: "Documentos consultados eventualmente, guardados por precaução legal em local distante do setor.", justificativa: "O aluno pode ter escolhido esta alternativa por confundir a 1ª idade (corrente) com a 2ª idade (intermediária), em que os documentos são consultados eventualmente." },
+            { texto: "Documentos de uso frequente, mantidos próximos aos setores que os produzem devido à importância administrativa.", justificativa: "Resposta correta: descreve o arquivo corrente — uso frequente e proximidade do setor produtor." },
+            { texto: "Documentos que perderam utilidade e aguardam eliminação segura por trituração.", justificativa: "O aluno pode ter escolhido esta alternativa por associar o destino final (eliminação) à fase inicial do ciclo documental." },
+            { texto: "Documentos de guarda permanente por valor histórico, como plantas de prédios.", justificativa: "O aluno pode ter escolhido esta alternativa por confundir a guarda permanente (3ª idade) com o arquivo corrente (1ª idade)." }
+        ],
+        correta: 1
+    },
+    {
+        capacidade: "Distinguir os dois destinos possíveis dos documentos na terceira idade do ciclo de vida documental.",
+        contexto: "Após cumprirem suas funções administrativas e passarem pelo arquivo intermediário, os documentos chegam à terceira idade, momento em que a comissão de avaliação decide o destino de cada conjunto documental.",
+        comando: "Descreva os dois caminhos previstos para os documentos na terceira idade do ciclo de vida documental.",
+        alternativas: [
+            { texto: "Arquivamento intermediário ou devolução ao setor de origem.", justificativa: "O aluno pode ter escolhido esta alternativa por confundir as fases, atribuindo à 3ª idade funções que pertencem à 1ª e à 2ª idades." },
+            { texto: "Uso frequente no setor produtor ou uso eventual em depósito.", justificativa: "O aluno pode ter escolhido esta alternativa por descrever critérios de frequência de uso, típicos das fases corrente e intermediária." },
+            { texto: "Eliminação por descarte ou guarda permanente por valor histórico.", justificativa: "Resposta correta: na 3ª idade, os documentos são descartados (eliminação) ou preservados por valor histórico (guarda permanente)." },
+            { texto: "Ordenação alfabética ou ordenação cronológica dos documentos.", justificativa: "O aluno pode ter escolhido esta alternativa por confundir destinação final com métodos de ordenação documental." }
+        ],
+        correta: 2
+    },
+    {
+        capacidade: "Explicar a função dos manuais e normas técnicas dentro da organização.",
+        contexto: "No setor de qualidade de uma empresa, os colaboradores consultam frequentemente um documento que estabelece, passo a passo, como cada atividade deve ser executada, com linguagem formal e regras obrigatórias.",
+        comando: "Explique a função dos manuais e normas técnicas dentro da organização.",
+        alternativas: [
+            { texto: "Padronizar, instruir e normatizar regras, empregando linguagem rigorosa e técnica.", justificativa: "Resposta correta: manuais e normas têm a função de padronizar e instruir procedimentos com rigor técnico." },
+            { texto: "Consolidar dados financeiros para prestação de contas à diretoria.", justificativa: "O aluno pode ter escolhido esta alternativa por confundir o manual com relatórios contábeis e financeiros." },
+            { texto: "Divulgar inovações do mercado com linguagem acessível e comunicativa.", justificativa: "O aluno pode ter escolhido esta alternativa por confundir manuais com revistas e periódicos, que tratam de inovações com linguagem acessível." },
+            { texto: "Registrar atas de reuniões em linguagem informal.", justificativa: "O aluno pode ter escolhido esta alternativa por pensar em documentos como atas, que possuem outra finalidade e formato." }
+        ],
+        correta: 0
+    },
+    {
+        capacidade: "Aplicar o método de ordenação numérico ou cronológico a um conjunto de faturas de fornecedores.",
+        contexto: "O setor financeiro de uma empresa organiza as faturas de fornecedores em pastas separadas por mês e ano de emissão, o que permite localizar rapidamente documentos por período.",
+        comando: "Identifique o método de ordenação aplicado na organização das faturas descrita.",
+        alternativas: [
+            { texto: "Alfanumérico, combinando letras e números de forma alternada.", justificativa: "O aluno pode ter escolhido esta alternativa por observar que faturas possuem número; confundiu o método com a presença de numeração no documento." },
+            { texto: "Ideográfico, agrupando documentos por assunto.", justificativa: "O aluno pode ter escolhido esta alternativa por pensar em agrupar por assunto (fornecedores), quando a organização descrita é por data." },
+            { texto: "Alfabético, seguindo o nome do fornecedor.", justificativa: "O aluno pode ter escolhido esta alternativa por considerar a ordenação pelo nome do fornecedor, que não é o critério descrito." },
+            { texto: "Numérico ou cronológico, ordenando por data de emissão.", justificativa: "Resposta correta: a ordenação por mês e ano é numérica/cronológica, com base na data de emissão." }
+        ],
+        correta: 3
+    },
+    {
+        capacidade: "Determinar o método de ordenação por assunto (ideográfico) a partir de uma situação de organização de acervo.",
+        contexto: "Em uma biblioteca, os livros técnicos de um mesmo tema são agrupados juntos nas estantes, identificados pelo código de classificação na lombada.",
+        comando: "Determine o método de ordenação adotado nessa organização por tema.",
+        alternativas: [
+            { texto: "Alfabético, pela ordem dos nomes dos autores.", justificativa: "O aluno pode ter escolhido esta alternativa por confundir assunto com autor, comum em bibliotecas." },
+            { texto: "Por assunto (ideográfico), agrupando obras do mesmo tema.", justificativa: "Resposta correta: agrupar por tema é exatamente o método ideográfico (por assunto)." },
+            { texto: "Numérico, por registro contínuo de entrada.", justificativa: "O aluno pode ter escolhido esta alternativa por observar o código na lombada e associá-lo a numeração de registro." },
+            { texto: "Cronológico, pela data de publicação.", justificativa: "O aluno pode ter escolhido esta alternativa por pensar em ordem de publicação, que não é o critério descrito." }
+        ],
+        correta: 1
+    },
+    {
+        capacidade: "Identificar a medida corretiva adequada para mitigar o agente de risco umidade e fungos em acervos documentais.",
+        contexto: "Um arquivo físico apresentou mofo em caixas de documentos devido ao ambiente fechado e à umidade elevada. O responsável precisa adotar medidas corretivas.",
+        comando: "Indique a medida corretiva adequada para mitigar o agente de risco umidade e fungos.",
+        alternativas: [
+            { texto: "Retirar clipes de metal antes de arquivar os documentos.", justificativa: "O aluno pode ter escolhido esta alternativa por confundir o agente umidade com o agente clipes de metal (corrosão)." },
+            { texto: "Manter os arquivos longe de janelas e usar iluminação indireta.", justificativa: "O aluno pode ter escolhido esta alternativa por confundir o agente umidade com o agente luz." },
+            { texto: "Manter salas ventiladas, controlar a temperatura e usar desumidificadores.", justificativa: "Resposta correta: ventilação, controle de temperatura e desumidificação combatem a umidade e os fungos." },
+            { texto: "Utilizar luvas de látex no manuseio e treinar a leitura de manuais.", justificativa: "O aluno pode ter escolhido esta alternativa por confundir o agente umidade com o manuseio e uso de EPI." }
+        ],
+        correta: 2
+    },
+    {
+        capacidade: "Justificar a importância do Procedimento Operacional Padrão (POP) na gestão documental.",
+        contexto: "Em uma empresa, o POP descreve passo a passo como arquivar, consultar e descartar documentos. Um novo colaborador consegue executar as tarefas apenas lendo o documento, sem depender da orientação de colegas.",
+        comando: "Explique por que o POP é considerado essencial na gestão documental.",
+        alternativas: [
+            { texto: "Permite que qualquer novo colaborador execute a tarefa corretamente, sem depender de tradições orais.", justificativa: "Resposta correta: o POP padroniza procedimentos, dispensando repasse informal de conhecimento." },
+            { texto: "Substitui contratos físicos e notas fiscais por arquivos digitais.", justificativa: "O aluno pode ter escolhido esta alternativa por confundir POP com digitalização ou gestão eletrônica de documentos." },
+            { texto: "Reduz o ciclo de vida das notas fiscais a uma única idade.", justificativa: "O aluno pode ter escolhido esta alternativa por confundir POP com tabela de temporalidade." },
+            { texto: "Serve como planta histórica do prédio em caso de sinistro.", justificativa: "O aluno pode ter escolhido esta alternativa por confundir POP com documentos de valor histórico." }
+        ],
+        correta: 0
+    },
+    {
+        capacidade: "Descrever a postura de redação adequada a um relatório técnico executivo.",
+        contexto: "Um auditor precisa redigir um relatório técnico executivo para a diretoria, com informações claras, objetivas e sem marcas de pessoalidade, seguindo a norma culta.",
+        comando: "Descreva a postura de redação adequada ao relatório técnico executivo.",
+        alternativas: [
+            { texto: "Manter impessoalidade, coesão e norma culta, evitando gírias e opiniões pessoais.", justificativa: "Resposta correta: impessoalidade, coesão e norma culta são exigências do relatório técnico executivo." },
+            { texto: "Utilizar abreviações de internet para acelerar a leitura pela diretoria.", justificativa: "O aluno pode ter escolhido esta alternativa por confundir objetividade com informalidade." },
+            { texto: "Escrever de forma opinativa e pessoal para dar personalidade ao texto.", justificativa: "O aluno pode ter escolhido esta alternativa por confundir \"dar personalidade\" com credibilidade técnica." },
+            { texto: "Dispensar glossário para não ofender a inteligência do leitor.", justificativa: "O aluno pode ter escolhido esta alternativa por considerar o glossário desnecessário, quando ele nivela o conhecimento entre leitores." }
+        ],
+        correta: 0
+    },
+    {
+        capacidade: "Explicar a finalidade do glossário técnico em relatórios corporativos.",
+        contexto: "Um relatório corporativo usa termos técnicos específicos do setor de arquivo. Para garantir que leitores de outros setores compreendam o texto, o autor inclui um glossário ao final.",
+        comando: "Explique a finalidade do glossário técnico nesse contexto.",
+        alternativas: [
+            { texto: "Substituir as regras de classificação decimal em bibliotecas.", justificativa: "O aluno pode ter escolhido esta alternativa por confundir glossário com classificação decimal (CDU/CDD)." },
+            { texto: "Prevenir o ressecamento do papel durante o manuseio.", justificativa: "O aluno pode ter escolhido esta alternativa por confundir glossário com medidas de conservação preventiva." },
+            { texto: "Explicar jargões técnicos, nivelando o conhecimento entre leitores de diferentes setores.", justificativa: "Resposta correta: o glossário explica termos técnicos para leitores externos ao setor, nivelando o conhecimento." },
+            { texto: "Eliminar a fase de arquivo corrente na empresa.", justificativa: "O aluno pode ter escolhido esta alternativa por confundir glossário com instrumentos de gestão documental." }
+        ],
+        correta: 2
+    },
+    {
+        capacidade: "Caracterizar as revistas e periódicos quanto à linguagem e à finalidade, em contraste com manuais técnicos.",
+        contexto: "Em uma auditoria documental, o auditor compara dois conjuntos: de um lado, manuais com linguagem técnica e estrutura normativa obrigatória; de outro, revistas que divulgam inovações do mercado com linguagem acessível.",
+        comando: "Caracterize as revistas e periódicos, considerando linguagem e finalidade.",
+        alternativas: [
+            { texto: "Informar sobre inovações e tendências com linguagem acessível e comunicativa.", justificativa: "Resposta correta: revistas e periódicos informam inovações e tendências com linguagem mais acessível e comunicativa." },
+            { texto: "Apresentar alta carga normativa com estrutura obrigatória e linguagem estritamente técnica.", justificativa: "O aluno pode ter escolhido esta alternativa por confundir revista com manual ou norma técnica." },
+            { texto: "Consolidar dados e contas da diretoria em balanço anual fechado.", justificativa: "O aluno pode ter escolhido esta alternativa por confundir revista com relatórios financeiros ou balanços." },
+            { texto: "Garantir guarda permanente desde a data de fundação.", justificativa: "O aluno pode ter escolhido esta alternativa por confundir revista com documentos de guarda permanente." }
+        ],
+        correta: 0
+    }
+];
+
+/* ==========================================================
+   CONFIGURAÇÕES
+   ========================================================== */
+const PONTOS_INFRACAO = 1;
+const LETRAS = ['a', 'b', 'c', 'd'];
+
+/* ==========================================================
+   ESTADO
+   ========================================================== */
+const state = {
+    studentName: '',
+    studentID: '',
+    penalties: 0,
+    answers: new Array(questoes.length).fill(null),
+    currentQuestion: 0,
+    questionTimes: new Array(questoes.length).fill(0),
+    questionStart: null,
+    startTime: null,
+    endTime: null,
+    timerId: null,
+    submitted: false,
+    lastScore: null
+};
+
+const answeredExercises = new Set();
+
+/* ==========================================================
+   UTILITÁRIOS
+   ========================================================== */
+function escapeHtml(str) {
+    return String(str).replace(/[&<>"']/g, c => (
+        { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]
+    ));
+}
+function slugify(str) {
+    return String(str).normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+        .replace(/[^a-z0-9]/gi, '_').replace(/_+/g, '_').replace(/^_|_$/g, '').toLowerCase();
+}
+function formatRunningTime(seconds) {
+    const t = Math.max(0, Math.floor(seconds));
+    const h = Math.floor(t / 3600);
+    const m = Math.floor((t % 3600) / 60);
+    const s = t % 60;
+    if (h > 0) return String(h).padStart(2,'0') + ':' + String(m).padStart(2,'0') + ':' + String(s).padStart(2,'0');
+    return String(m).padStart(2, '0') + ':' + String(s).padStart(2, '0');
+}
+function formatDuration(ms) {
+    const totalSec = Math.round(ms / 1000);
+    const h = Math.floor(totalSec / 3600);
+    const m = Math.floor((totalSec % 3600) / 60);
+    const s = totalSec % 60;
+    if (h > 0) return `${h}h ${m}m ${String(s).padStart(2,'0')}s`;
+    return `${m}m ${String(s).padStart(2,'0')}s`;
+}
+function formatDateLong(d) {
+    return d.toLocaleDateString('pt-BR', { weekday: 'long', day: '2-digit', month: 'long', year: 'numeric' });
+}
+function formatDateShort(d) { return d.toLocaleDateString('pt-BR'); }
+function formatDateTime(d)  { return d.toLocaleString('pt-BR'); }
+
+let toastTimer = null;
+function showToast(message, type = 'danger') {
+    const el = document.getElementById('toast');
+    el.textContent = message;
+    el.className = 'toast show ' + (type === 'info' ? 'info' : type === 'warning' ? 'warning' : '');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => el.classList.remove('show'), 4500);
+}
+
+/* ==========================================================
+   INICIALIZAÇÃO
+   ========================================================== */
+document.addEventListener('DOMContentLoaded', () => {
+    const hoje = new Date();
+    document.getElementById('study-date').textContent = formatDateLong(hoje);
+    document.getElementById('reg-date').textContent   = formatDateLong(hoje);
+    document.getElementById('exam-date').textContent  = formatDateShort(hoje);
+});
+
+/* ==========================================================
+   ESTUDO: exercícios e navegação
+   ========================================================== */
+function checkStudyExercise(btn) {
+    const exId = btn.dataset.ex;
+    const allBtns = document.querySelectorAll(`[data-ex="${exId}"]`);
+    if (!allBtns.length || allBtns[0].disabled) return;
+
+    allBtns.forEach(b => {
+        b.disabled = true;
+        if (b.dataset.correct === 'true') {
+            b.classList.add('ex-correct');
+        }
+    });
+
+    const fb = document.getElementById('fb-' + exId);
+    if (btn.dataset.correct === 'true') {
+        fb.innerHTML = '<span class="fb-ok">✔ Correto! Muito bem.</span>';
+    } else {
+        btn.classList.add('ex-wrong');
+        fb.innerHTML = '<span class="fb-bad">✘ Não foi essa. A alternativa correta está destacada em verde.</span>';
+    }
+
+    answeredExercises.add(exId);
+    document.getElementById('study-progress').textContent = answeredExercises.size;
+}
+
+function goToRegistration() {
+    document.getElementById('study-screen').classList.remove('active');
+    document.getElementById('student-registration').classList.add('active');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+/* ==========================================================
+   FLUXO DA PROVA
+   ========================================================== */
+function startExam() {
+    const nome = document.getElementById('studentName').value.trim();
+    const matricula = document.getElementById('studentID').value.trim();
+
+    if (nome.length < 3) {
+        alert('Por favor, informe seu nome completo.');
+        document.getElementById('studentName').focus();
+        return;
+    }
+    if (!matricula) {
+        alert('Por favor, informe sua matrícula.');
+        document.getElementById('studentID').focus();
+        return;
+    }
+
+    state.studentName = nome;
+    state.studentID = matricula;
+    state.startTime = Date.now();
+
+    document.getElementById('start-btn').disabled = true;
+    document.getElementById('student-registration').classList.remove('active');
+    document.getElementById('exam-screen').classList.add('active');
+    document.getElementById('display-name').textContent = nome;
+    document.getElementById('exam-date').textContent = formatDateShort(new Date());
+
+    renderCurrentQuestion();
+    startRunningTimer();
+    setupAntiCheat();
+
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function renderCurrentQuestion() {
+    const i = state.currentQuestion;
+    const q = questoes[i];
+    const isLast = i === questoes.length - 1;
+    const btnText = isLast ? 'Finalizar Prova' : 'Avançar →';
+
+    const respondidas = state.answers.filter(a => a !== null).length;
+    const progressPct = ((i + 1) / questoes.length) * 100;
+
+    const optionsHTML = q.alternativas.map((alt, j) => `
+        <li>
+            <label class="option-label" for="q${i}o${j}">
+                <input type="radio" id="q${i}o${j}" name="q${i}" value="${j}"
+                       ${state.answers[i] === j ? 'checked' : ''}
+                       onchange="saveAnswer(${i}, ${j})">
+                <span class="option-letter">${LETRAS[j]})</span>
+                <span class="option-text">${alt.texto}</span>
+            </label>
+        </li>
+    `).join('');
+
+    document.getElementById('questions-container').innerHTML = `
+        <div class="progress-wrapper">
+            <div class="progress-header">
+                <span>Questão ${i + 1} de ${questoes.length}</span>
+                <span>Respondidas: ${respondidas}/${questoes.length}</span>
+            </div>
+            <div class="progress-bar" role="progressbar"
+                 aria-valuenow="${i + 1}" aria-valuemin="0" aria-valuemax="${questoes.length}">
+                <div class="progress-fill" style="width: ${progressPct}%"></div>
+            </div>
+        </div>
+
+        <div class="question-card">
+            <div class="capacity-box">
+                <span class="capacity-label">Capacidade</span>
+                <span class="capacity-text">${q.capacidade}</span>
+            </div>
+            <div class="section">
+                <span class="section-label">Contexto</span>
+                <p class="context-text">${q.contexto}</p>
+            </div>
+            <div class="section">
+                <span class="section-label">Comando</span>
+                <p class="command-text">${q.comando}</p>
+            </div>
+            <div class="section">
+                <span class="section-label">Alternativas</span>
+                <ul class="options-list">${optionsHTML}</ul>
+            </div>
+        </div>
+
+        <button class="btn" id="advance-btn" onclick="advanceQuestion()">${btnText}</button>
+    `;
+
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function saveAnswer(qIndex, optIndex) {
+    state.answers[qIndex] = optIndex;
+    const respondidas = state.answers.filter(a => a !== null).length;
+    const el = document.querySelector('.progress-header span:last-child');
+    if (el) el.textContent = `Respondidas: ${respondidas}/${questoes.length}`;
+}
+
+function advanceQuestion() {
+    if (state.submitted) return;
+    const i = state.currentQuestion;
+    const isLast = i === questoes.length - 1;
+
+    if (state.answers[i] === null) {
+        const msg = isLast
+            ? 'Você não respondeu a última questão. Deseja finalizar a prova mesmo assim?'
+            : 'Você não respondeu esta questão. Deseja avançar mesmo assim?';
+        if (!confirm(msg)) return;
+    }
+
+    if (state.questionStart) state.questionTimes[i] = Date.now() - state.questionStart;
+
+    if (isLast) { submitExam(); return; }
+
+    state.currentQuestion++;
+    renderCurrentQuestion();
+}
+
+function startRunningTimer() {
+    updateRunningTimerUI();
+    state.timerId = setInterval(() => {
+        if (state.submitted) return;
+        updateRunningTimerUI();
+    }, 1000);
+}
+function updateRunningTimerUI() {
+    if (!state.startTime) return;
+    const elapsedSec = Math.floor((Date.now() - state.startTime) / 1000);
+    document.getElementById('running-timer').textContent = formatRunningTime(elapsedSec);
+}
+
+function setupAntiCheat() {
+    document.addEventListener('visibilitychange', () => {
+        const emProva = document.getElementById('exam-screen').classList.contains('active');
+        if (document.hidden && emProva && !state.submitted) {
+            state.penalties += PONTOS_INFRACAO;
+            document.getElementById('penalty-count').textContent = state.penalties;
+            showToast(`Atenção! Você saiu da tela de prova. Infração registrada (-${PONTOS_INFRACAO} ponto).`);
+        }
+    });
+}
+
+function calculateScore() {
+    const correctCount = state.answers.reduce(
+        (acc, ans, idx) => acc + (ans === questoes[idx].correta ? 1 : 0), 0
+    );
+    const baseScore = (correctCount / questoes.length) * 100;
+    const finalScore = Math.max(0, baseScore - state.penalties);
+    return { correctCount, baseScore, finalScore };
+}
+
+function submitExam() {
+    if (state.submitted) return;
+    state.submitted = true;
+
+    if (state.questionStart && state.currentQuestion < state.questionTimes.length) {
+        state.questionTimes[state.currentQuestion] = Date.now() - state.questionStart;
+    }
+    state.endTime = Date.now();
+    clearInterval(state.timerId);
+
+    const score = calculateScore();
+    state.lastScore = score;
+
+    document.getElementById('exam-screen').classList.remove('active');
+    document.getElementById('result-screen').classList.add('active');
+    document.getElementById('final-score').textContent =
+        `Nota Final: ${score.finalScore.toFixed(2)} / 100`;
+
+    const tempoTotalUsado = formatDuration(state.endTime - state.startTime);
+
+    document.getElementById('score-breakdown').innerHTML = `
+        <li><span>Acertos</span><span>${score.correctCount} de ${questoes.length}</span></li>
+        <li><span>Nota bruta (acertos)</span><span>${score.baseScore.toFixed(2)} pts</span></li>
+        <li><span>Penalidades por infração</span><span>-${state.penalties} pts</span></li>
+        <li><span>Tempo total utilizado</span><span>${tempoTotalUsado}</span></li>
+        <li><span>Nota final</span><span>${score.finalScore.toFixed(2)} pts</span></li>
+    `;
+
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    generatePDF(score);
+}
+
+/* ==========================================================
+   PDF
+   ========================================================== */
+function buildPdfHtml(score) {
+    const tempoTotalUsado = formatDuration(state.endTime - state.startTime);
+    const dataHora = formatDateTime(new Date(state.endTime));
+
+    const revisao = questoes.map((q, idx) => {
+        const respostaAluno = state.answers[idx];
+        const respondida = respostaAluno !== null;
+        const correta = respondida && respostaAluno === q.correta;
+        const status = !respondida ? '—' : (correta ? '✔ Correta' : '✘ Incorreta');
+        const tempo = state.questionTimes[idx] ? formatDuration(state.questionTimes[idx]) : '—';
+
+        const opcoesHtml = q.alternativas.map((alt, j) => {
+            const marcada = respostaAluno === j;
+            const ehGabarito = q.correta === j;
+            let classe = '';
+            if (ehGabarito) classe = 'correct-option';
+            else if (marcada && !ehGabarito) classe = 'wrong-option';
+
+            const marcador = marcada ? ' ◄ sua escolha' : '';
+            const gabaritoMarker = ehGabarito ? ' ✔ gabarito' : '';
+
+            return `
+                <div class="pdf-option ${classe}">
+                    <span class="pdf-option-letter">${LETRAS[j]})</span>
+                    <span>${escapeHtml(alt.texto)}</span>
+                    <span class="${ehGabarito ? 'ok' : (marcada ? 'bad' : '')}">${gabaritoMarker}${marcador}</span>
+                    <div class="pdf-just"><strong>Justificativa:</strong> ${escapeHtml(alt.justificativa)}</div>
+                </div>
+            `;
+        }).join('');
+
+        return `
+            <div class="pdf-question">
+                <p class="pdf-q-title">Questão ${idx + 1} — Tempo: ${tempo} — ${status}</p>
+                <div class="pdf-q-capacity"><strong>Capacidade:</strong> ${escapeHtml(q.capacidade)}</div>
+                <div class="pdf-q-context"><strong>Contexto:</strong> ${escapeHtml(q.contexto)}</div>
+                <div class="pdf-q-command"><strong>Comando:</strong> ${escapeHtml(q.comando)}</div>
+                <div>${opcoesHtml}</div>
+            </div>
+        `;
+    }).join('');
+
+    return `
+        <div class="pdf-header">
+            <h2>Auditoria Documental — Relatório de Avaliação</h2>
+            <p>Aluno(a): <strong>${escapeHtml(state.studentName)}</strong> | Matrícula: <strong>${escapeHtml(state.studentID)}</strong></p>
+            <p>Data/Hora de conclusão: ${dataHora}</p>
+        </div>
+        <table class="pdf-summary">
+            <tr><td>Acertos</td><td>${score.correctCount} de ${questoes.length}</td></tr>
+            <tr><td>Nota bruta (acertos)</td><td>${score.baseScore.toFixed(2)} pts</td></tr>
+            <tr><td>Penalidades (saída de tela)</td><td>-${state.penalties} pts</td></tr>
+            <tr><td>Tempo total utilizado</td><td>${tempoTotalUsado}</td></tr>
+            <tr><td>Nota Final</td><td><strong>${score.finalScore.toFixed(2)} / 100</strong></td></tr>
+        </table>
+        <div class="pdf-section-title">Revisão das questões</div>
+        <div>${revisao}</div>
+    `;
+}
+
+/* ==========================================================
+   GERAÇÃO DO PDF — CORRIGIDA
+   - Contêiner fica em left:0/top:0 com opacity:0 (renderizado)
+   - Aguarda requestAnimationFrame + 150ms para garantir layout
+   - Sem scrollX/scrollY (usa posição real do elemento)
+   ========================================================== */
+async function generatePDF(score) {
+    const container = document.getElementById('pdf-template-container');
+
+    // 1. Preenche e exibe (invisível, mas pintado)
+    container.innerHTML = buildPdfHtml(score);
+    container.style.display = 'block';
+
+    // 2. Aguarda o navegador concluir layout + paint
+    await new Promise(resolve => {
+        requestAnimationFrame(() => setTimeout(resolve, 150));
+    });
+
+    // 3. Opções do html2pdf (sem scrollX/scrollY)
+    const opcoes = {
+        margin: [12, 10, 14, 10],
+        filename: `Prova_Gestao_Arquivos_${slugify(state.studentName)}.pdf`,
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: {
+            scale: 2,
+            useCORS: true,
+            backgroundColor: '#ffffff',
+            logging: false
+        },
+        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
+        pagebreak: { mode: ['css', 'legacy'] }
+    };
+
+    try {
+        await html2pdf().set(opcoes).from(container).save();
+    } catch (err) {
+        console.error('Falha ao gerar PDF:', err);
+        alert('Não foi possível gerar o PDF automaticamente. Use Ctrl+P para imprimir a página.');
+    } finally {
+        container.innerHTML = '';
+        container.style.display = 'none';
+    }
+}
+
+function downloadPDF() {
+    if (!state.lastScore) {
+        alert('Nenhum resultado disponível. Finalize a prova primeiro.');
+        return;
+    }
+    generatePDF(state.lastScore);
+}
+</script>
+</body>
+</html>
